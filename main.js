@@ -81,3 +81,15 @@ ScrollReveal().reveal(".download__links", {
   ...scrollRevealOption,
   delay: 1500,
 });
+$(document).ready(function() {
+  // ใช้ event delegation เพื่อจัดการกับปุ่มที่สร้างแบบไดนามิก
+  $(document).on('click', '.exportBtn', function() {
+      const filename = $(this).data('filename');
+      // เรียกใช้ฟังก์ชัน exportToCSV ที่อยู่ในไฟล์อื่น
+      if (typeof exportToCSV === 'function') {
+          exportToCSV(filename);
+      } else {
+          console.error('exportToCSV function is not defined');
+      }
+  });
+});

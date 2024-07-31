@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OCR and CSV Management</title>
+    <title>RVCheck</title>
     <link rel="stylesheet" href="styles.css"> 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="export.js"></script>
+    <script src="main.js"></script>
     
 </head>
 <body>
@@ -86,7 +88,7 @@
                             <td>${formattedUploadDate}</td>
                             <td>${formattedModifiedDate}</td>
                             <td><button class="btn btn-info btn-sm checkDocBtn" data-filename="${result.filename}">Check Document</button></td>
-                            <td><button class="btn btn-success btn-sm deleteBtn" data-filename="${result.filename}">Export</button></td>
+                            <td><button class="btn btn-success btn-sm exportBtn" data-filename="${result.filename}">Export</button></td>
                             <td><button class="btn btn-danger btn-sm deleteBtn" data-filename="${result.filename}">Delete</button></td>
                         </tr>
                     `);
