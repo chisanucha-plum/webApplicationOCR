@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Details</title>
+    <link rel="stylesheet" href="styless.css"> <!-- เชื่อมโยงไฟล์ CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="navigation-arrows">
+            <a href="index.html" class="btn btn-danger mt-3">Back to Main Page</a>
+
+            <span id="filename"></span>
+            <button class="btn btn-success mb-2" id="exportCSV">Export CSV</button>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="documentDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Document
+            </button>
+            <div class="dropdown-menu" aria-labelledby="documentDropdown">
+                <a class="dropdown-item" href="#" data-doc="rs">RS</a>
+                <a class="dropdown-item" href="#" data-doc="misumi">MISUMI</a>
+                <a class="dropdown-item" href="#" data-doc="ofm">OFM</a>
+                <a class="dropdown-item" href="#" data-doc="homemart">Homemart</a>
+            </div>
+            
+        </div> 
+        
+        <div class="dropdown-image-container mb-4">
+            <div id="imageContainer" class="image-section">
+                <!-- Image will be injected here -->
+            </div>
+            <div id="documentInfo" class="document-info">
+                <!-- Document info will be injected here -->
+            </div>
+        </div>
+
+        <div class="ocr-info-container">
+            <div id="documentContent" class="document-container">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+           
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <h3>Extracted Information</h3>
+                <p><strong>Name:</strong> <span id="name"></span></p>
+                <p><strong>Date:</strong> <span id="date"></span></p>
+                <p><strong>No:</strong> <span id="number"></span></p>
+                <p><strong>Invoice No:</strong> <span id="invoice_no"></span></p>
+                <p><strong>Customer ID:</strong> <span id="customer_id"></span></p>
+                <p><strong>Currency:</strong> <span id="currency"></span></p>
+            </div>
+            
+        </div>
+        <a href="index.html" class="btn btn-secondary mt-3">Back to Main Page</a>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            const params = new URLSearchParams(window.location.search);
+            const filename = params.get('filename');
+
+            if (filename) {
+                const API_BASE_URL = 'http://localhost:5000';
+
+                // Display filename
+                $('#filename').text(filename);
+
+                // Load image
+                $('#imageContainer').html(`
+                    <img src="${API_BASE_URL}/uploads/${filename}" alt="${filename}" class="img-fluid">
+                `);
+
+                // Load OCR text and apply regex classification
+                $.ajax({
+                    url: `${API_BASE_URL}/api/get_ocr_text/${filename}.txt`,
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.text) {
+                            const classifiedText = classifyText(response.text);
+                            $('#documentContent').html(`
+                                <div class="text-section">
+                                    
+                                    <div id="ocrText" class="ocr-text">
+                                        <h3>OCR Text:</h3>
+                                        <p>${classifiedText}</p>
+                                    </div>
+                                </div>
+                            `);
+                        } else {
+                            $('#documentContent').html('<p>No OCR text available.</p>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Failed to fetch OCR text:', xhr.responseText);
+                        $('#documentContent').html('<p>No OCR text available.</p>');
+                    }
+                });
+            } else {
+                $('#documentContent').html('<p>No filename specified.</p>');
+            }
+
+            // Dropdown document selection
+            $('.dropdown-item').click(function() {
+                const docType = $(this).data('doc');
+                loadDocumentInfo(docType);
+            });
+
+            function loadDocumentInfo(docType) {
+                const fields = [
+                    'Invoice Type', 'Date of Invoice', 'Customer Tax ID', 'Invoice No.', 
+                    'Head Office', 'Tax ID No.', 'Bill to Address', 'Purchase Order Ref.', 
+                    'Ship-to Address', 'Delivery No.', 'VAT', 'Total'
+                ];
+
+                const ocrText = $('#ocrText').text();
+                const moneyRegex = /\b\d{1,3}(?:,\d{3})*(?:\.\d{2})\b/g;
+                const invoiceNoRegex = /\b\d{6,8}\b/g;
+                const idNoRegex = /\d{13,}/g;
+                const dNoRegex = /\d{10,}/g;
+                const ddNoRegex = /\d{10,}/g;
+                const purchaseOrder = /PO\d{8,}/g;
+                const headOffice = 'RS Components Co,Ltd';
+                let taxID = '0105559115222';
+                let taxIDrv = '0105549076224';
+                let company = 'TAX INVOICE';
+                let vat = '7.00%';
+                let rv = 'RV CONNEX CO., LTD. 30/1 M.1 PAHOLYOTIN RD. KLONGNUEANG KLONGLUANG PATHUMTHANI 12120';
+                let rvt = 'บริษัท อาร์ วี คอนเน็กซ์ จํากัด(สํานักงานใหญ่)';
+                let mit = 'MISUMI (THAILAND) CO., LTD.';
+
+                const infoHtml = fields.map(field => {
+                    let value = "-----";
+                    let regex;
+
+                    switch (docType) {
+                        case 'rs':
+                            switch (field) {
+                                case 'Date of Invoice':
+                                    regex = /\b\d{2}\.\d{2}\.\d{4}\b/;
+                                    break;
+                                case 'Customer Tax ID':
+                                    value = taxID;
+                                    break;
+                                case 'Invoice No.':
+                                    regex = invoiceNoRegex; 
+                                    break;
+                                case 'Purchase Order Ref.':
+                                    regex = purchaseOrder; 
+                                    break;
+                                case 'Delivery No.':
+                                    regex = ddNoRegex; 
+                                    break;
+                                case 'Total':
+                                    regex =  moneyRegex; 
+                                    break;
+                                case 'Tax ID No.':
+                                    value = taxIDrv; 
+                                    break;
+                                case 'Invoice Type':
+                                    value = company;  
+                                    break;
+                                case 'Head Office':
+                                    value = headOffice;  
+                                    break;
+                                case 'Bill to Address':
+                                    value = rv;  
+                                    break;
+                                case 'Ship-to Address':
+                                    value = rv;  
+                                    break;
+                                case 'VAT':
+                                    value = vat;  
+                                    break;
+                                // เพิ่มฟิลด์อื่นๆ สำหรับ RS ตามต้องการ
+                            }
+                            break;
+                        case 'misumi':
+                            switch (field) {
+                                case 'Invoice Type':
+                                    value = company;  
+                                    break;
+                                case 'Date of Invoice':
+                                    regex = /\b\d{2} [a-zA-Z]{3} \d{4}\b/g;  
+                                    break;
+                                case 'Customer Tax ID':
+                                    regex = /Customer ID\s*:\s*(\d+)/i;  // ดึง Customer ID แทน
+                                    break;
+                                case 'Invoice No.':
+                                    regex = /Invoice No\s*:\s*(\w+)/i;  // ดึง Invoice No
+                                    break;
+                                case 'Head Office':
+                                    value = headOffice;  
+                                    break;
+                                case 'Tax ID No.':
+                                    value = taxIDrv;  
+                                    break;
+                                case 'Bill to Address':
+                                    value = rvt;  
+                                    break;
+                                case 'Purchase Order Ref.':
+                                    regex = /Purchase Order Ref\.\s*:\s*(\w+)/i;  
+                                    break;
+                                case 'Ship-to Address':
+                                    value = mit;  
+                                    break;
+                                case 'Delivery No.':
+                                    regex = /Delivery No\.\s*:\s*(\w+)/i;  
+                                    break;
+                                case 'VAT':
+                                    value = vat;  
+                                    break;
+                                // เพิ่มฟิลด์อื่นๆ สำหรับ MISUMI ตามต้องการ
+                            }
+                            break;
+                        case 'ofm':
+                            // เพิ่มข้อมูลฟิลด์สำหรับ OFM
+                            break;
+                        case 'homemart':
+                            // เพิ่มข้อมูลฟิลด์สำหรับ Homemart
+                            break;
+                    }
+
+                    if (regex) {
+            const match = ocrText.match(regex);
+            if (match) {
+                if (match.length > 1) {
+                    // สร้าง dropdown สำหรับค่าที่มีหลายตัวเลือก
+                    const options = match.map(v => `<option value="${v}">${v}</option>`).join('');
+                    return `
+                        <p><strong>${field}:</strong> 
+                        <select class="form-control">
+                            ${options}
+                        </select>
+                        <span class="dropdown-indicator">&#9660;</span>
+                        </p>
+                    `;
+                } else {
+                    value = match[0];
+                }
+            }
+        }
+
+        // สร้าง input field ที่แก้ไขได้
+        return `
+            <p><strong>${field}:</strong> <input type="text" placeholder="${field}" value="${value}" class="form-control"></p>
+        `;
+    }).join('');
+
+    $('#documentInfo').html(infoHtml);
+}
+            // Function to classify OCR text
+            function classifyText(text) {
+                // Implement your text classification logic here
+                return text; // This is a placeholder; replace with actual classification
+            }                        
+            // Export CSV functionality
+            $('#exportCSV').click(function() {
+    const fields = [
+        'Invoice Type', 'Date of Invoice', 'Customer Tax ID', 'Invoice No.', 
+        'Head Office', 'Tax ID No.', 'Bill to Address', 'Purchase Order Ref.', 
+        'Ship-to Address', 'Delivery No.', 'VAT', 'Total'
+    ];
+
+    const values = fields.map(field => {
+        let value = $(`#documentInfo input[placeholder="${field}"]`).val() || 
+                    $(`#documentInfo select[data-field="${field}"]`).val() || 
+                    '-----';
+        // Escape special characters and wrap in quotes
+        return '"' + value.replace(/"/g, '""') + '"';
+    });
+
+    let csvContent = '\ufeff'; // Add BOM for UTF-8
+    csvContent += fields.map(field => '"' + field + '"').join(',') + '\n'; // Headers
+    csvContent += values.join(',') + '\n'; // Data
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                if (link.download !== undefined) {
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', 'document_info.csv');
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            });
+
+            
+        });
+    </script>
+    <br>
+    <footer>
+        <p>&copy; Copyright © 2024 Web Design Mastery. All rights reserved.</p>
+    </footer>
+</body>
+</html>

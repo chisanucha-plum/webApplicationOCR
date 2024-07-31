@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap");
+body {
+    background-color: #ebebeb;
+   
+}
+.container {
+    max-width: 1300px;
+}
+
+.card {
+    margin-bottom: 20px;
+}
+.form-group label {
+    font-weight: bold;
+}
+.upload-container {
+    text-align: center;
+    padding: 60px;
+    border: 2px dashed #6c757d;
+    background: linear-gradient(to right,#ffffff);
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+.upload-container:hover {
+    border-color: #7ba1ca;
+}
+.upload-container input[type="file"] {
+    display: none;
+}
+.upload-container label {
+    color: #524646;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+}
+.upload-container p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #000000;
+}
+.ocr-table {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+}
+.ocr-table th, .ocr-table td {
+    vertical-align: middle;
+}
+.ocr-table th {
+    width: 16.66%;
+}
+
+
+footer {
+    background: linear-gradient(to right,  rgb(191, 45, 0), rgb(158, 18, 5));
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+

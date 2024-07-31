@@ -1,0 +1,60 @@
+.dropdown-image-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.image-section img {
+    width: 100%; /* Ensures the image takes up the full width of its container */
+    max-width: 700px; /* Limits the maximum width of the image */
+    height: auto; /* Maintains aspect ratio */
+}
+
+.document-info {
+    flex: 1;
+    margin-top: 20px;
+}
+.ocr-info-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.ocr-text {
+    margin-bottom: 20px;
+}
+.document-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+.text-section {
+    flex: 1;
+    margin-right: 20px;
+}
+.navigation-arrows {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.dropdown-indicator {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+#documentInfo p {
+    position: relative;
+}
+#documentInfo select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 20px;
+}
+footer {
+    background: linear-gradient(to right, rgb(191, 45, 0), rgb(158, 18, 5));
+    color: white;
+    text-align: center;
+    padding: 10px;
+    
+}
