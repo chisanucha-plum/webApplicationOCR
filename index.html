@@ -42,8 +42,8 @@
                 <div class="d-flex justify-content-between mt-3">
                     <input type="text" id="searchInput" class="form-control w-25" placeholder="Search by file name or date">
                     <div>
-                        <button id="exportBtn" class="btn btn-success">Export to CSV</button>
-                        <button id="deleteSelectedBtn" class="btn btn-danger">Delete Selected</button>
+                        <button id="exportBtn" class="btn btn-success">EXPORT</button>
+                        <button id="deleteSelectedBtn" class="btn btn-danger">DELETE</button>
                     </div>
                 </div>
                 <div id="ocrResults" class="mt-3 ocr-table">
@@ -88,9 +88,9 @@
                             <td>${result.filename}</td>
                             <td>${formattedUploadDate}</td>
                             <td>${formattedModifiedDate}</td>
-                            <td><button class="btn btn-info btn-sm checkDocBtn" data-filename="${result.filename}" data-checked="false">Check Document</button></td>
-                            <td><button class="btn btn-success btn-sm exportBtn" data-filename="${result.filename}">Export</button></td>
-                            <td><button class="btn btn-danger btn-sm deleteBtn" data-filename="${result.filename}">Delete</button></td>
+                            <td><button class="btn btn-info btn-sm checkDocBtn" data-filename="${result.filename}" data-checked="false">Ready to Check</button></td>
+                            <td><button class="btn btn-success btn-sm exportBtn" data-filename="${result.filename}">EXPORT</button></td>
+                            <td><button class="btn btn-danger btn-sm deleteBtn" data-filename="${result.filename}">DELETE</button></td>
                         </tr>
                     `);
                 });

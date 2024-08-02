@@ -14,20 +14,22 @@
 <body>
     <div class="container mt-5">
         <div class="navigation-arrows">
-            <a href="index.html" class="btn btn-danger mt-3">Back to Main Page</a>
+            <a href="index.html" class="btn btn-danger mt-3">BACK</a>
 
             <span id="filename"></span>
-            <button class="btn btn-success mb-2" id="exportCSV">Export CSV</button>
+            <button class="btn btn-success mb-2" id="exportCSV">EXPORT FILE</button>
         </div>
         <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="documentDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Select Document
+                CUSTOMIZE
             </button>
             <div class="dropdown-menu" aria-labelledby="documentDropdown">
                 <a class="dropdown-item" href="#" data-doc="rs">RS</a>
                 <a class="dropdown-item" href="#" data-doc="misumi">MISUMI</a>
                 <a class="dropdown-item" href="#" data-doc="ofm">OFM</a>
-                <a class="dropdown-item" href="#" data-doc="homemart">Homemart</a>
+                <a class="dropdown-item" href="#" data-doc="homemart">HOMEMART</a>
+                <a class="dropdown-item" href="#" data-doc="homemart">----</a>
+                <a class="dropdown-item" href="#" data-doc="homemart">----</a>
             </div>
             
         </div> 
@@ -48,25 +50,25 @@
         </div>
            
         
-        <a href="index.html" class="btn btn-secondary mt-3">Back to Main Page</a>
+        <a href="index.html" class="btn btn-danger mt-3">BACK</a>
     </div>
 
     <script>
         $(document).ready(function() {
             const params = new URLSearchParams(window.location.search);
             const filename = params.get('filename');
-
+    
             if (filename) {
                 const API_BASE_URL = 'http://localhost:5000';
-
+    
                 // Display filename
                 $('#filename').text(filename);
-
+    
                 // Load image
                 $('#imageContainer').html(`
                     <img src="${API_BASE_URL}/uploads/${filename}" alt="${filename}" class="img-fluid">
                 `);
-
+    
                 // Load OCR text and apply regex classification
                 $.ajax({
                     url: `${API_BASE_URL}/api/get_ocr_text/${filename}.txt`,
@@ -76,7 +78,6 @@
                             const classifiedText = classifyText(response.text);
                             $('#documentContent').html(`
                                 <div class="text-section">
-                                    
                                     <div id="ocrText" class="ocr-text">
                                         <h3>OCR Text:</h3>
                                         <p>${classifiedText}</p>
@@ -95,23 +96,23 @@
             } else {
                 $('#documentContent').html('<p>No filename specified.</p>');
             }
+    
             // Dropdown document selection
             $('.dropdown-item').click(function() {
                 const docType = $(this).data('doc');
                 loadDocumentInfo(docType);
             });
-
+    
             // Set default document type to 'RS' on page load
             loadDocumentInfo('rs');
-
-
+    
             function loadDocumentInfo(docType) {
                 const fields = [
                     'Invoice Type', 'Date of Invoice', 'Customer Tax ID', 'Invoice No.', 
                     'Head Office', 'Tax ID No.', 'Bill to Address', 'Purchase Order Ref.', 
                     'Ship-to Address', 'Delivery No.', 'VAT', 'Total'
                 ];
-
+    
                 const ocrText = $('#ocrText').text();
                 const moneyRegex = /\b\d{1,3}(?:,\d{3})*(?:\.\d{2})\b/g;
                 const invoiceNoRegex = /\b\d{6,8}\b/g;
@@ -121,18 +122,18 @@
                 const purchaseOrder = /PO\d{8,}/g;
                 const headOffice = 'RS Components Co,Ltd';
                 let taxID = '0105559115222';
-                let taxIDrv = '0105549076224'; //taxidrv
-                let taxIDmi = '0105540008838'; //taxidmisumi
+                let taxIDrv = '0105549076224';
+                let taxIDmi = '0105540008838';
                 let company = 'TAX INVOICE';
                 let vat = '7.00%';
                 let rv = 'RV CONNEX CO., LTD. 30/1 M.1 PAHOLYOTIN RD. KLONGNUEANG KLONGLUANG PATHUMTHANI 12120';
                 let rvt = 'บริษัท อาร์ วี คอนเน็กซ์ จํากัด(สํานักงานใหญ่)';
                 let mit = 'MISUMI (THAILAND) CO., LTD.';
-
+    
                 const infoHtml = fields.map(field => {
                     let value = "-----";
                     let regex;
-
+    
                     switch (docType) {
                         case 'rs':
                             switch (field) {
@@ -172,7 +173,6 @@
                                 case 'VAT':
                                     value = vat;  
                                     break;
-                                // เพิ่มฟิลด์อื่นๆ สำหรับ RS ตามต้องการ
                             }
                             break;
                         case 'misumi':
@@ -187,7 +187,7 @@
                                     value = taxIDmi;
                                     break;
                                 case 'Invoice No.':
-                                    regex = /\bLN\d{10}H2\b/g;// ดึง Invoice No
+                                    regex = /\bLN\d{10}H2\b/g;
                                     break;
                                 case 'Head Office':
                                     value = headOffice;  
@@ -213,86 +213,75 @@
                                 case 'Total':
                                     regex =  moneyRegex; 
                                     break;
-                                // เพิ่มฟิลด์อื่นๆ สำหรับ MISUMI ตามต้องการ
                             }
                             break;
-                        case 'ofm':
-                            // เพิ่มข้อมูลฟิลด์สำหรับ OFM
-                            break;
-                        case 'homemart':
-                            // เพิ่มข้อมูลฟิลด์สำหรับ Homemart
-                            break;
                     }
-
+    
                     if (regex) {
-            const match = ocrText.match(regex);
-            if (match) {
-                if (match.length > 1) {
-                    // สร้าง dropdown สำหรับค่าที่มีหลายตัวเลือก
-                    const options = match.map(v => `<option value="${v}">${v}</option>`).join('');
+                        const match = ocrText.match(regex);
+                        if (match) {
+                            if (match.length > 1) {
+                                const options = match.map(v => `<option value="${v}">${v}</option>`).join('');
+                                return `
+                                    <p><strong>${field}:</strong> 
+                                    <select class="form-control" data-field="${field}">
+                                        ${options}
+                                    </select>
+                                    <span class="dropdown-indicator">&#9660;</span>
+                                    </p>
+                                `;
+                            } else {
+                                value = match[0];
+                            }
+                        }
+                    }
+    
                     return `
-                        <p><strong>${field}:</strong> 
-                        <select class="form-control">
-                            ${options}
-                        </select>
-                        <span class="dropdown-indicator">&#9660;</span>
-                        </p>
+                        <p><strong>${field}:</strong> <input type="text" placeholder="${field}" value="${value}" class="form-control"></p>
                     `;
-                } else {
-                    value = match[0];
-                }
+                }).join('');
+    
+                $('#documentInfo').html(infoHtml);
             }
-        }
-
-        // สร้าง input field ที่แก้ไขได้
-        return `
-            <p><strong>${field}:</strong> <input type="text" placeholder="${field}" value="${value}" class="form-control"></p>
-        `;
-    }).join('');
-
-    $('#documentInfo').html(infoHtml);
-}
-            // Function to classify OCR text
+    
             function classifyText(text) {
-                // Implement your text classification logic here
-                return text; // This is a placeholder; replace with actual classification
+                return text;
             }                        
-            // Export CSV functionality
+    
             $('#exportCSV').click(function() {
-    const fields = [
-        'Invoice Type', 'Date of Invoice', 'Customer Tax ID', 'Invoice No.', 
-        'Head Office', 'Tax ID No.', 'Bill to Address', 'Purchase Order Ref.', 
-        'Ship-to Address', 'Delivery No.', 'VAT', 'Total'
-    ];
+            const fields = [
+                'Invoice Type', 'Date of Invoice', 'Customer Tax ID', 'Invoice No.', 
+                'Head Office', 'Tax ID No.', 'Bill to Address', 'Purchase Order Ref.', 
+                'Ship-to Address', 'Delivery No.', 'VAT', 'Total'
+            ];
 
-    const values = fields.map(field => {
-        let value = $(`#documentInfo input[placeholder="${field}"]`).val() || 
-                    $(`#documentInfo select[data-field="${field}"]`).val() || 
-                    '-----';
-        // Escape special characters and wrap in quotes
-        return '"' + value.replace(/"/g, '""') + '"';
-    });
-
-    let csvContent = '\ufeff'; // Add BOM for UTF-8
-    csvContent += fields.map(field => '"' + field + '"').join(',') + '\n'; // Headers
-    csvContent += values.join(',') + '\n'; // Data
-
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                if (link.download !== undefined) {
-                    const url = URL.createObjectURL(blob);
-                    link.setAttribute('href', url);
-                    link.setAttribute('download', 'document_info.csv');
-                    link.style.visibility = 'hidden';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
+            const values = fields.map(field => {
+                let value = $(`#documentInfo input[placeholder="${field}"]`).val() || 
+                            $(`#documentInfo select[data-field="${field}"]`).val() || 
+                            '-----';
+                return '"' + value.replace(/"/g, '""') + '"';
             });
 
-            
+            let csvContent = '\ufeff';
+            csvContent += fields.map(field => '"' + field + '"').join(',') + '\n';
+            csvContent += values.join(',') + '\n';
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'document_info.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+
         });
     </script>
+    
     <br>
     <footer>
         <p>&copy; Copyright © 2024 Web Design Mastery. All rights reserved.</p>
