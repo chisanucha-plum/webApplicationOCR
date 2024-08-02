@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/logo.png" >
     <title>RVCheck</title>
     <link rel="stylesheet" href="styles.css"> 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="export.js"></script>
+    
     <script src="main.js"></script>
     
 </head>
@@ -87,7 +88,7 @@
                             <td>${result.filename}</td>
                             <td>${formattedUploadDate}</td>
                             <td>${formattedModifiedDate}</td>
-                            <td><button class="btn btn-info btn-sm checkDocBtn" data-filename="${result.filename}">Check Document</button></td>
+                            <td><button class="btn btn-info btn-sm checkDocBtn" data-filename="${result.filename}" data-checked="false">Check Document</button></td>
                             <td><button class="btn btn-success btn-sm exportBtn" data-filename="${result.filename}">Export</button></td>
                             <td><button class="btn btn-danger btn-sm deleteBtn" data-filename="${result.filename}">Delete</button></td>
                         </tr>
@@ -202,6 +203,33 @@
                 link.click();
                 document.body.removeChild(link);
             });
+
+                        $(document).ready(function() {
+                console.log("Document is ready");
+
+                $('.checkDocBtn').on('click', function() {
+                    console.log("Button clicked");
+                    const $btn = $(this);
+                    const filename = $btn.data('filename');
+                    const isChecked = $btn.data('checked') === 'true';
+
+                    console.log("Filename:", filename);
+
+                    if (isChecked) {
+                        $btn.removeClass('btn-success').addClass('btn-info');
+                        $btn.text('Check Document');
+                        $btn.data('checked', 'false');
+                    } else {
+                        $btn.removeClass('btn-info').addClass('btn-success');
+                        $btn.text('Checked');
+                        $btn.data('checked', 'true');
+                    }
+
+                    console.log("Button updated");
+                    alert(`Document ${filename} has been ${isChecked ? 'unchecked' : 'checked'}!`);
+                });
+            });
+
 
             $('#searchInput').on('input', function() {
                 const searchText = $(this).val().toLowerCase();

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/logo.png" >
     <title>RVCheck</title>
     <link rel="stylesheet" href="document_detail.css"> <!-- เชื่อมโยงไฟล์ CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -120,7 +121,8 @@
                 const purchaseOrder = /PO\d{8,}/g;
                 const headOffice = 'RS Components Co,Ltd';
                 let taxID = '0105559115222';
-                let taxIDrv = '0105549076224';
+                let taxIDrv = '0105549076224'; //taxidrv
+                let taxIDmi = '0105540008838'; //taxidmisumi
                 let company = 'TAX INVOICE';
                 let vat = '7.00%';
                 let rv = 'RV CONNEX CO., LTD. 30/1 M.1 PAHOLYOTIN RD. KLONGNUEANG KLONGLUANG PATHUMTHANI 12120';
@@ -182,22 +184,22 @@
                                     regex = /\b\d{2} [a-zA-Z]{3} \d{4}\b/g;  
                                     break;
                                 case 'Customer Tax ID':
-                                    regex = /Customer ID\s*:\s*(\d+)/i;  // ดึง Customer ID แทน
+                                    value = taxIDmi;
                                     break;
                                 case 'Invoice No.':
-                                    regex = /Invoice No\s*:\s*(\w+)/i;  // ดึง Invoice No
+                                    regex = /\bLN\d{10}H2\b/g;// ดึง Invoice No
                                     break;
                                 case 'Head Office':
                                     value = headOffice;  
                                     break;
                                 case 'Tax ID No.':
-                                    value = taxIDrv;  
+                                    value = taxID;  
                                     break;
                                 case 'Bill to Address':
                                     value = rvt;  
                                     break;
                                 case 'Purchase Order Ref.':
-                                    regex = /Purchase Order Ref\.\s*:\s*(\w+)/i;  
+                                    regex = purchaseOrder;
                                     break;
                                 case 'Ship-to Address':
                                     value = mit;  
@@ -207,6 +209,9 @@
                                     break;
                                 case 'VAT':
                                     value = vat;  
+                                    break;
+                                case 'Total':
+                                    regex =  moneyRegex; 
                                     break;
                                 // เพิ่มฟิลด์อื่นๆ สำหรับ MISUMI ตามต้องการ
                             }

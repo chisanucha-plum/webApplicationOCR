@@ -81,6 +81,7 @@ ScrollReveal().reveal(".download__links", {
   ...scrollRevealOption,
   delay: 1500,
 });
+
 $(document).ready(function() {
   // ใช้ event delegation เพื่อจัดการกับปุ่มที่สร้างแบบไดนามิก
   $(document).on('click', '.exportBtn', function() {
@@ -93,3 +94,4 @@ $(document).ready(function() {
       }
   });
 });
+
